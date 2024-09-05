@@ -1,7 +1,7 @@
 # Raycast-Adaptative-Reverb
- Adaptative reverb in Unity using STK and CPU-based raytracing.
- See the [documentation](./docs/Adaptive_Reverberation_in_Unity_Games-Albert_Madrenys.pdf) for more information about
- the achoustic principles and their implementation within a raytracing approach.
+Adaptive reverb in Unity using STK and CPU-based raytracing.
+See the [documentation](./docs/Adaptive_Reverberation_in_Unity_Games-Albert_Madrenys.pdf) for more information about
+the acoustic principles and their implementation within a raytracing approach.
 
 ## License
 
