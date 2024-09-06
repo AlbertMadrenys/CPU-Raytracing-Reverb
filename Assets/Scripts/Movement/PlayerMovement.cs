@@ -11,8 +11,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float m_JumpForce = 1200f;
     [SerializeField] private LayerMask m_GroundLayerMask;
 
-    [SerializeField] private GameObject m_AbsortionLayout;
-    [SerializeField] private AudioRaycaster m_Raycaster;
+    [SerializeField] private GameObject m_DynamicLayout;
+    [SerializeField] private AudioRaycasterSKT m_Raycaster;
 
     private InputManager m_InputManager;
     private CharacterController m_CharacterController;
@@ -32,7 +32,7 @@ public class PlayerMovement : MonoBehaviour
     private void Start()
     {
         m_InputManager.OnJumpInputPerformed.AddListener(Jump);
-        m_InputManager.OnDoSomethingInputPerformed.AddListener(ChangeLayout);
+        m_InputManager.OnChangeLayoutInputPerformed.AddListener(ChangeLayout);
     }
 
     private void FixedUpdate()
@@ -46,6 +46,10 @@ public class PlayerMovement : MonoBehaviour
         if (m_IsGrounded && m_TryJump)
         {
             m_MovementVelocity.y = m_JumpForce / m_Mass;
+        }
+        else if(m_IsGrounded)
+        {
+            m_MovementVelocity.y = 0f;
         }
         else
         {
@@ -61,9 +65,10 @@ public class PlayerMovement : MonoBehaviour
         m_TryJump = true;
     }
 
+    // Change the layout of the main square
     private void ChangeLayout()
     {
-        m_AbsortionLayout.SetActive(!m_AbsortionLayout.activeSelf);
-        m_Raycaster.ForceNextTrigger(m_AbsortionLayout.activeSelf);
+        m_DynamicLayout.SetActive(!m_DynamicLayout.activeSelf);
+        m_Raycaster.ForceNextTrigger();
     }
 }

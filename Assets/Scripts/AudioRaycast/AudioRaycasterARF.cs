@@ -2,8 +2,11 @@ using System;
 using System.Linq;
 using UnityEngine;
 
+
+// Obsolete Component used to trigger audio signals and collect the data.
+// Then the data is interpreted in the AudioReverbFilter, but it's incomplete.
 [RequireComponent(typeof(AudioReverbFilter))]
-public class AudioRaycaster : MonoBehaviour
+public class AudioRaycasterARF : MonoBehaviour
 {
     [SerializeField] private LayerMask m_CollisionLayerMask;
     [SerializeField] private float m_TriggerInterval = 5;
@@ -58,6 +61,7 @@ public class AudioRaycaster : MonoBehaviour
         }
     }
 
+    // Not finished
     private void InterpretData(bool makeDiffusion = false)
     {
         float eRDelay = 0;

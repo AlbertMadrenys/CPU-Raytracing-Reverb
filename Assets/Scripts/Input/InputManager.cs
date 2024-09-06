@@ -21,7 +21,7 @@ public class InputManager : MonoBehaviour
 
     public UnityEvent OnJumpInputPerformed;
 
-    public UnityEvent OnDoSomethingInputPerformed;
+    public UnityEvent OnChangeLayoutInputPerformed;
 
     private void Awake()
     {
@@ -31,12 +31,14 @@ public class InputManager : MonoBehaviour
 
         m_InputMaster.Movement.HorizontalMovement.performed += OnHorizontalMovementInputPerformed_Internal;
         m_InputMaster.Movement.Jump.performed += OnJumpInputPerformed_Internal;
-        m_InputMaster.Movement.DoSomething.performed += OnDoSomethingInputPerformed_Internal;
+        m_InputMaster.Movement.ChangeLayout.performed += OnChangeLayoutInputPerformed_Internal;
 
         m_InputMaster.CameraLook.DeltaX.performed += OnCameraLookXInputPerformed_Internal;
         m_InputMaster.CameraLook.DeltaY.performed += OnCameraLookYInputPerformed_Internal;
         m_InputMaster.CameraLook.DeltaX.canceled += OnCameraLookXInputPerformed_Internal;
         m_InputMaster.CameraLook.DeltaY.canceled += OnCameraLookYInputPerformed_Internal;
+
+        m_InputMaster.Other.ExitGame.performed += OnExitGameInputPerformed_Internal;
     }
 
     private void OnEnable()
@@ -69,8 +71,13 @@ public class InputManager : MonoBehaviour
         m_CameraDeltaLook.y = ctx.ReadValue<float>();
     }
 
-    private void OnDoSomethingInputPerformed_Internal(InputAction.CallbackContext ctx)
+    private void OnChangeLayoutInputPerformed_Internal(InputAction.CallbackContext ctx)
     {
-        if (ctx.performed) OnDoSomethingInputPerformed?.Invoke();
+        if (ctx.performed) OnChangeLayoutInputPerformed?.Invoke();
+    }
+
+    private void OnExitGameInputPerformed_Internal(InputAction.CallbackContext ctx)
+    {
+        if (ctx.performed) Application.Quit();
     }
 }

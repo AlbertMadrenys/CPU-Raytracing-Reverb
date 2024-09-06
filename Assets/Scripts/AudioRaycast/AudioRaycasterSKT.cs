@@ -33,12 +33,13 @@ public class AudioRaycasterSKT : MonoBehaviour
         }
     }
 
-    public void ForceNextTrigger(bool makeDiffusion)
+    public void ForceNextTrigger()
     {
         m_NextTriggerTimer = 0;
         TriggerRaycast();
-        InterpretData(makeDiffusion);
+        InterpretData();
     }
+
     private void TriggerRaycast()
     {
         if(m_SignalDataArray != null) Array.Clear(m_SignalDataArray, 0, m_SignalDataArray.Length);
@@ -58,28 +59,66 @@ public class AudioRaycasterSKT : MonoBehaviour
         }
     }
 
-    private void InterpretData(bool makeDiffusion = false)
+    private void InterpretData()
     {
-        float eRDelay = 0;
-        float eRInten = 0;
+        float averageCoeff = 0, mfp = 0;
+        float upWeight = 0, downWeight = 0, leftWeight = 0, rightWeight = 0, forwardWeight = 0, backwardWeight = 0;
+        float upDist = 0, downDist = 0, leftDist = 0, rightDist = 0, forwardDist = 0, backwardDist = 0;
+
         for (int i = 0; i < m_Data.RayDirections.Count; i++)
         {
-            eRDelay += m_SignalDataArray[i].EarlyReflectionDelay;
-            eRInten += m_SignalDataArray[i].IntensityDifference;
+            averageCoeff += m_SignalDataArray[i].AverageAbsorpCoefficient;
+            mfp += m_SignalDataArray[i].MeanFreePath;
+
+            CalculateWeight(m_SignalDataArray[i], 0, ref rightWeight, ref rightDist, ref leftWeight, ref leftDist);
+            CalculateWeight(m_SignalDataArray[i], 1, ref upWeight, ref upDist, ref downWeight, ref downDist);
+            CalculateWeight(m_SignalDataArray[i], 2, ref forwardWeight, ref forwardDist, ref backwardWeight, ref backwardDist);
         }
+        averageCoeff /= m_SignalDataArray.Length;
+        if (averageCoeff >= 1) averageCoeff = 0.999999f;
+        mfp /= m_SignalDataArray.Length;
 
-        eRDelay /= m_SignalDataArray.Length;
-        eRInten /= m_SignalDataArray.Length;
-        Debug.Log(eRInten);
-        //m_ReverbFilter.reflectionsDelay = Mathf.Clamp(eRDelay/1000, 0f, 0.3f);
-        //m_ReverbFilter.reflectionsLevel = map(eRInten, -10000f, -40f, -10000f, 1000f);//Mathf.Clamp(eRInten * 100, -10000f, 2000f);
+        rightDist /= rightWeight;
+        leftDist /= leftWeight;
+        upDist /= upWeight;
+        downDist /= downWeight;
+        forwardDist /= forwardWeight;
+        backwardDist /= backwardWeight;
 
-        m_ReverbFilter.decayTime = 0; //mapping
-        m_ReverbFilter.sendLevel = 0; //mapping
+        var volume = (rightDist + leftDist) * (upDist + downDist) * (forwardDist + backwardDist);
+        var reverbField = mfp * (1 - averageCoeff) / (volume*averageCoeff);
+        var reverbTime = (-0.161f * mfp) / (4f * Mathf.Log(1 - averageCoeff));
+
+        m_ReverbFilter.sendLevel = Map(reverbField, 1E-06f, 0.08f , 0, 1);
+        m_ReverbFilter.decayTime = Mathf.Clamp(reverbTime, 0, 4f);
+        
+        Debug.DrawRay(transform.position, Vector3.up * upDist, Color.yellow, 2);
+        Debug.DrawRay(transform.position, Vector3.down * downDist, Color.yellow, 2);
+        Debug.DrawRay(transform.position, Vector3.left * leftDist, Color.yellow, 2);
+        Debug.DrawRay(transform.position, Vector3.right * rightDist, Color.yellow, 2);
+        Debug.DrawRay(transform.position, Vector3.forward * forwardDist, Color.yellow, 2);
+        Debug.DrawRay(transform.position, Vector3.back * backwardDist, Color.yellow, 2);
+    }
+
+    // Calculates the weight and distance of the signalData projected to an axis. If the weight is negative, it is stored with a positive sight in the negative weight and distance
+    private void CalculateWeight(AudioSignalData signalData, int axis, ref float positiveWeight, ref float positiveDist, ref float negativeWeight, ref float negativeDist)
+    {
+        Vector3 axisVector = axis == 0 ? Vector3.right : (axis == 1 ? Vector3.up : Vector3.forward);
+        float newWeight = Vector3.Project(signalData.InitialDirection, axisVector)[axis];
+        if (newWeight > 0f)
+        {
+            positiveWeight += newWeight;
+            positiveDist += newWeight * signalData.SegmentLengths[0];
+        }
+        else
+        {
+            negativeWeight -= newWeight;
+            negativeDist -= newWeight * signalData.SegmentLengths[0];
+        }
     }
 
     // Maps a value from ome arbitrary range to another arbitrary range
-    public static float map(float value, float inMin, float inMax, float outMin, float outMax)
+    public static float Map(float value, float inMin, float inMax, float outMin, float outMax)
     {
         return outMin + (value - inMin) * (outMax - outMin) / (inMax - inMin);
     }

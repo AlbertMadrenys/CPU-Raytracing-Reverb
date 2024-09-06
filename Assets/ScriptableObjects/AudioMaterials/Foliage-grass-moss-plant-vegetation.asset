@@ -10,9 +10,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f9d58f470c2e6064eab371601d5a180f, type: 3}
-  m_Name: LotOfAbsortion
+  m_Name: Foliage-grass-moss-plant-vegetation
   m_EditorClassIdentifier: 
-  HFAtten: 0.4
-  MFAtten: 0.2
-  LFAtten: 0.1
-  AbsorptionCoefficient: 0.35
+  AbsorptionCoefficient: 0.75

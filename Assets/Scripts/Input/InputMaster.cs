@@ -64,7 +64,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""DoSomething"",
+                    ""name"": ""ChangeLayout"",
                     ""type"": ""Button"",
                     ""id"": ""09af6d93-aeec-4e7c-aed8-385dbf8623b5"",
                     ""expectedControlType"": ""Button"",
@@ -268,7 +268,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""DoSomething"",
+                    ""action"": ""ChangeLayout"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -352,6 +352,34 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Other"",
+            ""id"": ""3afaf2b0-0c60-4d68-b54f-8998cc06c1aa"",
+            ""actions"": [
+                {
+                    ""name"": ""ExitGame"",
+                    ""type"": ""Button"",
+                    ""id"": ""333f21db-d61d-4ea1-a501-d1231908c02f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""88b258b4-b31e-45a5-89bb-82015fc3caa1"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ExitGame"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -362,12 +390,15 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         m_Movement_Right = m_Movement.FindAction("Right", throwIfNotFound: true);
         m_Movement_HorizontalMovement = m_Movement.FindAction("HorizontalMovement", throwIfNotFound: true);
         m_Movement_Jump = m_Movement.FindAction("Jump", throwIfNotFound: true);
-        m_Movement_DoSomething = m_Movement.FindAction("DoSomething", throwIfNotFound: true);
+        m_Movement_ChangeLayout = m_Movement.FindAction("ChangeLayout", throwIfNotFound: true);
         // CameraLook
         m_CameraLook = asset.FindActionMap("CameraLook", throwIfNotFound: true);
         m_CameraLook_DeltaX = m_CameraLook.FindAction("DeltaX", throwIfNotFound: true);
         m_CameraLook_DeltaY = m_CameraLook.FindAction("DeltaY", throwIfNotFound: true);
         m_CameraLook_CameraInput = m_CameraLook.FindAction("CameraInput", throwIfNotFound: true);
+        // Other
+        m_Other = asset.FindActionMap("Other", throwIfNotFound: true);
+        m_Other_ExitGame = m_Other.FindAction("ExitGame", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -433,7 +464,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
     private readonly InputAction m_Movement_Right;
     private readonly InputAction m_Movement_HorizontalMovement;
     private readonly InputAction m_Movement_Jump;
-    private readonly InputAction m_Movement_DoSomething;
+    private readonly InputAction m_Movement_ChangeLayout;
     public struct MovementActions
     {
         private @InputMaster m_Wrapper;
@@ -442,7 +473,7 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         public InputAction @Right => m_Wrapper.m_Movement_Right;
         public InputAction @HorizontalMovement => m_Wrapper.m_Movement_HorizontalMovement;
         public InputAction @Jump => m_Wrapper.m_Movement_Jump;
-        public InputAction @DoSomething => m_Wrapper.m_Movement_DoSomething;
+        public InputAction @ChangeLayout => m_Wrapper.m_Movement_ChangeLayout;
         public InputActionMap Get() { return m_Wrapper.m_Movement; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -464,9 +495,9 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
-            @DoSomething.started += instance.OnDoSomething;
-            @DoSomething.performed += instance.OnDoSomething;
-            @DoSomething.canceled += instance.OnDoSomething;
+            @ChangeLayout.started += instance.OnChangeLayout;
+            @ChangeLayout.performed += instance.OnChangeLayout;
+            @ChangeLayout.canceled += instance.OnChangeLayout;
         }
 
         private void UnregisterCallbacks(IMovementActions instance)
@@ -483,9 +514,9 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
-            @DoSomething.started -= instance.OnDoSomething;
-            @DoSomething.performed -= instance.OnDoSomething;
-            @DoSomething.canceled -= instance.OnDoSomething;
+            @ChangeLayout.started -= instance.OnChangeLayout;
+            @ChangeLayout.performed -= instance.OnChangeLayout;
+            @ChangeLayout.canceled -= instance.OnChangeLayout;
         }
 
         public void RemoveCallbacks(IMovementActions instance)
@@ -565,18 +596,68 @@ public partial class @InputMaster: IInputActionCollection2, IDisposable
         }
     }
     public CameraLookActions @CameraLook => new CameraLookActions(this);
+
+    // Other
+    private readonly InputActionMap m_Other;
+    private List<IOtherActions> m_OtherActionsCallbackInterfaces = new List<IOtherActions>();
+    private readonly InputAction m_Other_ExitGame;
+    public struct OtherActions
+    {
+        private @InputMaster m_Wrapper;
+        public OtherActions(@InputMaster wrapper) { m_Wrapper = wrapper; }
+        public InputAction @ExitGame => m_Wrapper.m_Other_ExitGame;
+        public InputActionMap Get() { return m_Wrapper.m_Other; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(OtherActions set) { return set.Get(); }
+        public void AddCallbacks(IOtherActions instance)
+        {
+            if (instance == null || m_Wrapper.m_OtherActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_OtherActionsCallbackInterfaces.Add(instance);
+            @ExitGame.started += instance.OnExitGame;
+            @ExitGame.performed += instance.OnExitGame;
+            @ExitGame.canceled += instance.OnExitGame;
+        }
+
+        private void UnregisterCallbacks(IOtherActions instance)
+        {
+            @ExitGame.started -= instance.OnExitGame;
+            @ExitGame.performed -= instance.OnExitGame;
+            @ExitGame.canceled -= instance.OnExitGame;
+        }
+
+        public void RemoveCallbacks(IOtherActions instance)
+        {
+            if (m_Wrapper.m_OtherActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IOtherActions instance)
+        {
+            foreach (var item in m_Wrapper.m_OtherActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_OtherActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public OtherActions @Other => new OtherActions(this);
     public interface IMovementActions
     {
         void OnForward(InputAction.CallbackContext context);
         void OnRight(InputAction.CallbackContext context);
         void OnHorizontalMovement(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
-        void OnDoSomething(InputAction.CallbackContext context);
+        void OnChangeLayout(InputAction.CallbackContext context);
     }
     public interface ICameraLookActions
     {
         void OnDeltaX(InputAction.CallbackContext context);
         void OnDeltaY(InputAction.CallbackContext context);
         void OnCameraInput(InputAction.CallbackContext context);
+    }
+    public interface IOtherActions
+    {
+        void OnExitGame(InputAction.CallbackContext context);
     }
 }

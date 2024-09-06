@@ -24,7 +24,7 @@ public class NReverbFilter : MonoBehaviour
 
     void Awake ()
     {
-        reverb = new Stk.NReverb (decayTime);
+        if (reverb == null) reverb = new Stk.NReverb(decayTime);
         prevDecayTime = decayTime;
     }
 
@@ -47,6 +47,9 @@ public class NReverbFilter : MonoBehaviour
             error = "This filter only supports stereo audio (given:" + channels + ")";
             return;
         }
+
+        if(reverb == null) reverb = new Stk.NReverb(decayTime);
+
         for (var i = 0; i < data.Length; i += 2) {
             var output = reverb.Tick (0.2f * (data [i] + data [i + 1]));
             data [i] += output.left * sendLevel;

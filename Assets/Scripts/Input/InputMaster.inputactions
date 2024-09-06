@@ -42,7 +42,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "DoSomething",
+                    "name": "ChangeLayout",
                     "type": "Button",
                     "id": "09af6d93-aeec-4e7c-aed8-385dbf8623b5",
                     "expectedControlType": "Button",
@@ -246,7 +246,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "DoSomething",
+                    "action": "ChangeLayout",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
@@ -326,6 +326,34 @@
                     "processors": "",
                     "groups": "",
                     "action": "CameraInput",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Other",
+            "id": "3afaf2b0-0c60-4d68-b54f-8998cc06c1aa",
+            "actions": [
+                {
+                    "name": "ExitGame",
+                    "type": "Button",
+                    "id": "333f21db-d61d-4ea1-a501-d1231908c02f",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "88b258b4-b31e-45a5-89bb-82015fc3caa1",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ExitGame",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
