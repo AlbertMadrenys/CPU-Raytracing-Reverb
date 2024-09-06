@@ -8,7 +8,7 @@ their implementation using ray tracing, check out the [documentation](./docs/Ada
 This project uses Unity version 2022.3.12
 
 Images can be found [here](./images/).
-The executable can be found in [itch.io](https://albertmadrenys.itch.io/cpu-raytracing-reverb).
+The executable can be found on [itch.io](https://albertmadrenys.itch.io/cpu-raytracing-reverb).
 
 ## License
 
