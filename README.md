@@ -9,7 +9,7 @@ This project uses Unity version 2022.3.12
 
 Images can be found [here](./images/).
 
-# Executable
+## Executable
 
 The executable can be found on [itch.io](https://albertmadrenys.itch.io/cpu-raytracing-reverb).
 
